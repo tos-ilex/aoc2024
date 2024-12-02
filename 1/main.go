@@ -39,6 +39,24 @@ func getDistance(left, right []int) int {
 	return result
 }
 
+func countOccurrencesInSortedSlice(v int, slice []int) int {
+	firstIndex := sort.Search(len(slice), func(i int) bool { return slice[i] >= v })
+	if firstIndex == len(slice) || slice[firstIndex] != v || firstIndex == len(slice) {
+		return 0
+	}
+	lastIndex := sort.Search(len(slice), func(i int) bool { return slice[i] > v })
+	return lastIndex - firstIndex
+}
+
+func getSimilarity(left, right []int) int {
+	result := 0
+	for _, v := range left {
+		occurrenceCount := countOccurrencesInSortedSlice(v, right)
+		result += occurrenceCount * v
+	}
+	return result
+}
+
 func main() {
 	input, err := os.Open("input.txt")
 	panicIfNotNil(err)
@@ -51,15 +69,22 @@ func main() {
 	leftList, rightList := make([]int, listSize), make([]int, listSize)
 
 	scanner := bufio.NewScanner(input)
-	for firstEmptyIndex := 0; scanner.Scan(); firstEmptyIndex++ {
+	firstEmptyIndex := 0
+	for scanner.Scan() {
 		splitLine := strings.Split(scanner.Text(), "   ")
 		leftNum := parseInt(splitLine[0])
 		rightNum := parseInt(splitLine[1])
-		leftIndex := searchIndexForSortedInsert(leftNum, leftList[:firstEmptyIndex+1])
-		rightIndex := searchIndexForSortedInsert(rightNum, rightList[:firstEmptyIndex+1])
+		leftIndex := searchIndexForSortedInsert(leftNum, leftList[:firstEmptyIndex])
+		rightIndex := searchIndexForSortedInsert(rightNum, rightList[:firstEmptyIndex])
 		insertAt(leftIndex, leftNum, leftList)
 		insertAt(rightIndex, rightNum, rightList)
+		firstEmptyIndex++
 	}
 
+	leftList = leftList[:firstEmptyIndex]
+	rightList = rightList[:firstEmptyIndex]
+
 	fmt.Printf("Result distance: %d\n", getDistance(leftList, rightList))
+	fmt.Println(leftList)
+	fmt.Printf("Result similarity: %d\n", getSimilarity(leftList, rightList))
 }
