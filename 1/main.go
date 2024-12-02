@@ -25,6 +25,20 @@ func searchIndexForSortedInsert(numToInsert int, sliceToInsertIn []int) int {
 	return sort.Search(len(sliceToInsertIn), func(i int) bool { return sliceToInsertIn[i] >= numToInsert })
 }
 
+func insertAt(index int, value int, sliceToInsertIn []int) {
+	copy(sliceToInsertIn[index+1:], sliceToInsertIn[index:])
+	sliceToInsertIn[index] = value
+}
+
+func getDistance(left, right []int) int {
+	result := 0
+	for i := 0; i < len(left); i++ {
+		distance := left[i] - right[i]
+		result += max(distance, -distance)
+	}
+	return result
+}
+
 func main() {
 	input, err := os.Open("input.txt")
 	panicIfNotNil(err)
@@ -37,27 +51,15 @@ func main() {
 	leftList, rightList := make([]int, listSize), make([]int, listSize)
 
 	scanner := bufio.NewScanner(input)
-	for i := 0; scanner.Scan(); i++ { // i is the index of the first 'empty' list element in both lists
+	for firstEmptyIndex := 0; scanner.Scan(); firstEmptyIndex++ {
 		splitLine := strings.Split(scanner.Text(), "   ")
-		leftNum, rightNum := parseInt(splitLine[0]), parseInt(splitLine[1])
-
-		// this will do a binary search to find the index of the first element that's >= the number to insert
-		leftIndex, rightIndex := searchIndexForSortedInsert(leftNum, leftList[:i+1]), searchIndexForSortedInsert(rightNum, rightList[:i+1])
-
-		// shift values at index one to the right to make room
-		copy(leftList[leftIndex+1:], leftList[leftIndex:])
-		copy(rightList[rightIndex+1:], rightList[rightIndex:])
-
-		// then insert
-		leftList[leftIndex] = leftNum
-		rightList[rightIndex] = rightNum
+		leftNum := parseInt(splitLine[0])
+		rightNum := parseInt(splitLine[1])
+		leftIndex := searchIndexForSortedInsert(leftNum, leftList[:firstEmptyIndex+1])
+		rightIndex := searchIndexForSortedInsert(rightNum, rightList[:firstEmptyIndex+1])
+		insertAt(leftIndex, leftNum, leftList)
+		insertAt(rightIndex, rightNum, rightList)
 	}
 
-	distance := 0
-	// the left and right lists now contain the entire input in a sorted manner
-	for i := 0; i < len(leftList); i++ {
-		difference := leftList[i] - rightList[i]
-		distance += max(difference, -difference)
-	}
-	fmt.Printf("Result distance: %d\n", distance)
+	fmt.Printf("Result distance: %d\n", getDistance(leftList, rightList))
 }
