@@ -15,6 +15,16 @@ func panicIfNotNil(err error) {
 	}
 }
 
+func parseInt(s string) int {
+	result, err := strconv.Atoi(s)
+	panicIfNotNil(err)
+	return result
+}
+
+func searchIndexForSortedInsert(numToInsert int, sliceToInsertIn []int) int {
+	return sort.Search(len(sliceToInsertIn), func(i int) bool { return sliceToInsertIn[i] >= numToInsert })
+}
+
 func main() {
 	input, err := os.Open("input.txt")
 	panicIfNotNil(err)
@@ -29,14 +39,10 @@ func main() {
 	scanner := bufio.NewScanner(input)
 	for i := 0; scanner.Scan(); i++ { // i is the index of the first 'empty' list element in both lists
 		splitLine := strings.Split(scanner.Text(), "   ")
-		leftNum, err := strconv.Atoi(splitLine[0])
-		panicIfNotNil(err)
-		rightNum, err := strconv.Atoi(splitLine[1])
-		panicIfNotNil(err)
+		leftNum, rightNum := parseInt(splitLine[0]), parseInt(splitLine[1])
 
 		// this will do a binary search to find the index of the first element that's >= the number to insert
-		leftIndex := sort.Search(i+1, func(n int) bool { return leftList[n] >= leftNum })
-		rightIndex := sort.Search(i+1, func(n int) bool { return rightList[n] >= rightNum })
+		leftIndex, rightIndex := searchIndexForSortedInsert(leftNum, leftList[:i+1]), searchIndexForSortedInsert(rightNum, rightList[:i+1])
 
 		// shift values at index one to the right to make room
 		copy(leftList[leftIndex+1:], leftList[leftIndex:])
