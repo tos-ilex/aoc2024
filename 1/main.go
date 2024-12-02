@@ -33,10 +33,16 @@ func main() {
 		panicIfNotNil(err)
 		rightNum, err := strconv.Atoi(splitLine[1])
 		panicIfNotNil(err)
+
+		// this will do a binary search to find the index of the first element that's >= the number to insert
 		leftIndex := sort.Search(i+1, func(n int) bool { return leftList[n] >= leftNum })
 		rightIndex := sort.Search(i+1, func(n int) bool { return rightList[n] >= rightNum })
+
+		// shift values at index one to the right to make room
 		copy(leftList[leftIndex+1:], leftList[leftIndex:])
 		copy(rightList[rightIndex+1:], rightList[rightIndex:])
+
+		// then insert
 		leftList[leftIndex] = leftNum
 		rightList[rightIndex] = rightNum
 	}
