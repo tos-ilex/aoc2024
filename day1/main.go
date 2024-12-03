@@ -1,6 +1,7 @@
-package main
+package day1
 
 import (
+	"aoc/utils"
 	"bufio"
 	"fmt"
 	"os"
@@ -9,15 +10,9 @@ import (
 	"strings"
 )
 
-func panicIfNotNil(err error) {
-	if err != nil {
-		panic(err)
-	}
-}
-
 func parseInt(s string) int {
 	result, err := strconv.Atoi(s)
-	panicIfNotNil(err)
+	utils.PanicIfNotNil(err)
 	return result
 }
 
@@ -57,13 +52,13 @@ func getSimilarity(left, right []int) int {
 	return result
 }
 
-func main() {
-	input, err := os.Open("input.txt")
-	panicIfNotNil(err)
+func PrintSolution(inputPath string) {
+	input, err := os.Open(inputPath)
+	utils.PanicIfNotNil(err)
 	defer input.Close()
 
 	stat, err := input.Stat()
-	panicIfNotNil(err)
+	utils.PanicIfNotNil(err)
 
 	listSize := stat.Size() / 13 // input seems to be 13 chars per line so this should minimize resize ops
 	leftList, rightList := make([]int, listSize), make([]int, listSize)
@@ -84,7 +79,8 @@ func main() {
 	leftList = leftList[:firstEmptyIndex]
 	rightList = rightList[:firstEmptyIndex]
 
+	fmt.Println("Day 1")
 	fmt.Printf("Result distance: %d\n", getDistance(leftList, rightList))
-	fmt.Println(leftList)
 	fmt.Printf("Result similarity: %d\n", getSimilarity(leftList, rightList))
+	fmt.Println()
 }
