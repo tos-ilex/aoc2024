@@ -1,9 +1,9 @@
 package main
 
 import (
-	"aoc/day2"
+	"aoc/day3"
 )
 
 func main() {
-	day2.PrintSolution("day2/input.txt")
+	day3.PrintSolution("day3/input.txt")
 }
