@@ -46,7 +46,7 @@ func PrintSolution(path string) {
 	var input [][]byte
 
 	scanner := bufio.NewScanner(inputFile)
-	for i := 0; scanner.Scan(); i++ {
+	for scanner.Scan() {
 		input = append(input, []byte(scanner.Text()))
 	}
 
@@ -68,7 +68,6 @@ func PrintSolution(path string) {
 		for x := 0; x < len(input[y]); x++ {
 			if checkMas(x, y, input) {
 				masCount++
-				fmt.Printf("Found mas at %d %d\n", x, y)
 			}
 			for _, traversalFunction := range traversalFunctions {
 				if checkWord(x, y, input, "XMAS", traversalFunction) {
